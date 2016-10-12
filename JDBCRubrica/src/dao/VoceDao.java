@@ -11,7 +11,7 @@ import utility.DataSource;
 
 public class VoceDao {
 	//1-Create
-	public boolean creaVoce(String nome,String cognome,String telefono){
+	public boolean creaVoce(String nome,String cognome,String telefono, int id_rubrica){
 
 		boolean bool=false;
 		PreparedStatement st=null;
@@ -19,12 +19,13 @@ public class VoceDao {
 
 		try{
 			con=DataSource.getInstance().getConnection();
-			String sql="insert into VOCE(nome,COGNOME,TELEFONO)"+"VALUES(?,?,?)";
+			String sql="insert into VOCE(nome,COGNOME,TELEFONO,id_rubrica)"+"VALUES(?,?,?,?)";
 			st=con.prepareStatement(sql);
 
 			st.setString(1, nome);
 			st.setString(2, cognome);
 			st.setString(3, telefono);
+			st.setInt(4, id_rubrica);
 			int rs=st.executeUpdate();
 
 			if(rs>0) bool=true;
@@ -89,8 +90,57 @@ public class VoceDao {
 		return v;
 
 	}
+	
+	
+	//3-Read
+	
+	public Voce leggiVoce(String nome,String cognome,int id_r){
+		Voce v=null;
+		PreparedStatement st=null;
+		Connection con=null;
+		ResultSet rs=null;
+		try{
+			con=DataSource.getInstance().getConnection();
+			String sql="select*from VOCE where nome=? and cognome=? and id_rubrica=?";
+			st=con.prepareStatement(sql);
 
-	//3-Update
+			st.setString(1, nome);
+			st.setString(2, cognome);
+			st.setInt(3,id_r);
+			rs=st.executeQuery();
+
+
+			if(rs.next()){
+				int id_voce=rs.getInt(1);
+				String telefono=rs.getString(4);
+				
+				
+				v=new Voce(id_voce,nome,cognome,telefono,id_r);
+
+			}
+
+
+
+		}catch(SQLException|PropertyVetoException|IOException e){
+			e.printStackTrace();
+		}finally{
+			if(st!=null)
+			{
+				try {
+					st.close();
+				}catch(SQLException e){ 
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return v;
+
+	}
+	
+	
+
+	//4-Update
 	public boolean aggiornaVoce(int id_voce, String nome, String cognome, String telefono){
 
 		boolean bool=false;
@@ -124,7 +174,7 @@ public class VoceDao {
 		return bool;
 	}
 
-	//4-delete
+	//5-delete
 	public boolean rimuoviVoce(int id){
 
 		boolean bool=false;
