@@ -13,9 +13,9 @@ public class ServiziRubrica {
 	public Voce aggiungiVoce(Rubrica r,String nome,String cognome,String telefono){
 		
 		Voce v=null;
-		boolean bool=vDao.creaVoce(nome, cognome, telefono,r.getId_rubrica());
-		if (bool){
-			v=vDao.leggiVoce(nome,cognome,r.getId_rubrica());
+		int id=vDao.creaVoce(nome, cognome, telefono,r.getId_rubrica());
+		if(id!=0){
+			v = vDao.leggiVoce(id);
 		}
 		return v;
 	}

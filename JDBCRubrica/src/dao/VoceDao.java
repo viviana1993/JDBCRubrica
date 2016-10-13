@@ -6,29 +6,34 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import model.Voce;
 import utility.DataSource;
 
 public class VoceDao {
 	//1-Create
-	public boolean creaVoce(String nome,String cognome,String telefono, int id_rubrica){
+	public int creaVoce(String nome,String cognome,String telefono, int id_rubrica){
 
-		boolean bool=false;
+		int id_Voce=0;
 		PreparedStatement st=null;
 		Connection con=null;
 
 		try{
 			con=DataSource.getInstance().getConnection();
 			String sql="insert into VOCE(nome,COGNOME,TELEFONO,id_rubrica)"+"VALUES(?,?,?,?)";
-			st=con.prepareStatement(sql);
+			st=con.prepareStatement(sql,new String[]{"id_voce"});
 
 			st.setString(1, nome);
 			st.setString(2, cognome);
 			st.setString(3, telefono);
 			st.setInt(4, id_rubrica);
-			int rs=st.executeUpdate();
-
-			if(rs>0) bool=true;
+			st.executeUpdate();
+			ResultSet rs=st.getGeneratedKeys();
+			
+			if(rs.next() && rs!=null) {
+				id_Voce=rs.getInt(1);
+				
+			}
 
 		}catch(SQLException|PropertyVetoException|IOException e){
 			e.printStackTrace();
@@ -42,7 +47,7 @@ public class VoceDao {
 				}
 			}
 		}
-		return bool;
+		return id_Voce;
 	}
 
 
